@@ -5,7 +5,7 @@ import time
 
 import urllib
 import urllib2
-
+import os
 
 from boto import ec2
 
@@ -19,11 +19,11 @@ def do_wait():
 def do_ssh(ip, cmd):
     user = "ubuntu"
 
-    credentials = json.load(open('credentials.json', 'r'))
-    key_path = credentials['key_path']
-    key_name = credentials['key_name']
+    # credentials = json.load(open('credentials.json', 'r'))
+    key_name = 'mgsl'
+    key_path = os.path.join(os.path.expanduser('~/.ssh/'), key_name) + '.pem'
 
-    args = "-i " + key_path + key_name
+    args = "-i " + key_path
     args += " -o StrictHostKeyChecking=no"
 
     process = subprocess.Popen("ssh %s %s@%s '%s'" % (args, user, ip, cmd), shell=True,
@@ -54,6 +54,7 @@ def do_script(ip, script):
             if verbose:
                 print output
 
+
 def do_launch(it, instance_name):
 
     test = False
@@ -71,7 +72,18 @@ def do_launch(it, instance_name):
     if not test:
         group_name = "mgsl"
         security_group = do_security_group(ec2c, group_name)
-        key_name = credentials['key_name']
+
+        key_name = 'mgsl'
+        try:
+            key = ec2c.get_all_key_pairs(keynames=[key_name])[0]
+        except ec2c.ResponseError, e:
+            if e.code == 'InvalidKeyPair.NotFound':
+                # Create an SSH key to use when logging into instances.
+                key = ec2c.create_key_pair(key_name)
+                key.save(os.path.expanduser('~/.ssh/'))
+                # for some reason, Boto saves always with the .pem extension!
+            else:
+                raise
 
         reservation = ec2c.run_instances(ami,
                                           instance_type=it,
@@ -203,6 +215,7 @@ def do_dns2(hostname, ip):
 def do_security_group(ec2c, group_name):
     try:
         group = ec2c.get_all_security_groups(groupnames=[group_name])[0]
+        print 'security group already exists.'
     except ec2c.ResponseError, e:
         if e.code == 'InvalidGroup.NotFound':
             print "creating group %s" % group_name
@@ -229,7 +242,7 @@ def do_test():
     credentials = json.load(open('credentials.json', 'r'))
 
     success = True
-    for s in ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'key_name', 'key_path']:
+    for s in ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']:
         # print credentials[s], s, credentials[s] == s
         if credentials[s] == s:
             print "You need to edit credetials.json and fill in the " + s
