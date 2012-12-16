@@ -212,7 +212,11 @@ def do_security_group(ec2c):
         time.sleep(1)
 
     print "creating group %s" % group_name
-    group = ec2c.create_security_group(group_name, group_name)
+    try:
+        group = ec2.get_all_security_groups(groupnames=[group_name])[0]
+    except ec2.ResponseError, e:
+        if e.code == 'InvalidGroup.NotFound':
+            group = ec2c.create_security_group(group_name, group_name)
 
     ports = [
               ['icmp', '-1', '-1'],
