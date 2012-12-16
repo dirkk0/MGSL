@@ -218,21 +218,21 @@ def do_security_group(ec2c):
         if e.code == 'InvalidGroup.NotFound':
             group = ec2c.create_security_group(group_name, group_name)
 
-    ports = [
-              ['icmp', '-1', '-1'],
-              ['tcp', '22', '22'],
-              ['tcp', '25565', '25565'],
-              ['udp', '25565', '25565'],
-            ]
+            ports = [
+                      ['icmp', '-1', '-1'],
+                      ['tcp', '22', '22'],
+                      ['tcp', '25565', '25565'],
+                      ['udp', '25565', '25565'],
+                    ]
 
-    for port in ports:
-        ec2c.authorize_security_group(group_name,
-                       ip_protocol=port[0],
-                       from_port=port[1],
-                       to_port=port[2],
-                       cidr_ip='0.0.0.0/0')
-        print port
-    return group
+            for port in ports:
+                ec2c.authorize_security_group(group_name,
+                               ip_protocol=port[0],
+                               from_port=port[1],
+                               to_port=port[2],
+                               cidr_ip='0.0.0.0/0')
+                print port
+            return group
 
 
 def do_test():
