@@ -69,8 +69,8 @@ def do_launch(it, instance_name):
                 """
 
     if not test:
-        security_group = "mgsl"
-        security_group = do_security_group(ec2c)
+        group_name = "mgsl"
+        security_group = do_security_group(ec2c, group_name)
         key_name = credentials['key_name']
 
         reservation = ec2c.run_instances(ami,
@@ -200,22 +200,12 @@ def do_dns2(hostname, ip):
         return False
 
 
-def do_security_group(ec2c):
-    groups = ec2c.get_all_security_groups()
-
-    group_name = 'mgsl'
-
-    if any(g.name == group_name for g in groups):
-        print "found groupname %s, deleting it." % group_name
-        group = ec2c.delete_security_group(group_name)
-        print "deleted."
-        time.sleep(1)
-
-    print "creating group %s" % group_name
+def do_security_group(ec2c, group_name):
     try:
-        group = ec2.get_all_security_groups(groupnames=[group_name])[0]
-    except ec2.ResponseError, e:
+        group = ec2c.get_all_security_groups(groupnames=[group_name])[0]
+    except ec2c.ResponseError, e:
         if e.code == 'InvalidGroup.NotFound':
+            print "creating group %s" % group_name
             group = ec2c.create_security_group(group_name, group_name)
 
             ports = [
@@ -232,7 +222,7 @@ def do_security_group(ec2c):
                                to_port=port[2],
                                cidr_ip='0.0.0.0/0')
                 print port
-            return group
+    return group
 
 
 def do_test():
