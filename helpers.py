@@ -143,6 +143,27 @@ def do_killall():
                     print "abort - no kill"
 
 
+def do_status():
+    credentials = json.load(open('credentials.json', 'r'))
+    ec2c = ec2.connection.EC2Connection(
+           credentials['AWS_ACCESS_KEY_ID'],
+           credentials['AWS_SECRET_ACCESS_KEY'])
+
+    instances = ec2c.get_all_instances()
+
+    if instances:
+        for r in instances:
+            i = r.instances[0]
+
+            if i.__dict__['tags']:
+                name = i.__dict__['tags']['Name']
+            ip = i.public_dns_name
+            state = i.state
+            print name, ip, state
+    else:
+        print 'no servers running.'
+
+
 def do_dns1(hostname, ip):
     for i in xrange(5):
         result = do_dns2(hostname, ip)

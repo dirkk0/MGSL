@@ -9,7 +9,7 @@ credentials = json.load(open('credentials.json', 'r'))
 worldname = 'myworld'
 # we assume that you entered the FTP credentials into
 # credentials.json is you set the worldname
-if credentials['ftp_server'] == 'ftp_server' or credentials['']:
+if credentials['ftp_server'] == 'fill_ftp_server':
     print "Warning: no FTP server available."
     print "If you want your world to be saved, you need to fill up the file 'credentials.json'."
     print "Continue, if you don't care and/or just testing."
