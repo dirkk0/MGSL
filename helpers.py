@@ -19,8 +19,8 @@ def do_wait():
 def do_ssh(ip, cmd):
     user = "ubuntu"
 
-    # credentials = json.load(open('credentials.json', 'r'))
-    key_name = 'mgsl'
+    credentials = json.load(open('credentials.json', 'r'))
+    key_name = credentials['key_name']
     key_path = os.path.join(os.path.expanduser('~/.ssh/'), key_name) + '.pem'
 
     args = "-i " + key_path
