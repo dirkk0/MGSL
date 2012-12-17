@@ -41,6 +41,7 @@ def do_wait2(ip):
         print '.',
         output = do_ssh(ip, "ls")
         time.sleep(2)
+    print output
     print "... succesfully logged in once."
 
 
@@ -73,18 +74,9 @@ def do_launch(it, instance_name):
         group_name = "mgsl"
         security_group = do_security_group(ec2c, group_name)
 
-        key_name = 'mgsl'
-        try:
-            key = ec2c.get_all_key_pairs(keynames=[key_name])[0]
-        except ec2c.ResponseError, e:
-            if e.code == 'InvalidKeyPair.NotFound':
-                # Create an SSH key to use when logging into instances.
-                key = ec2c.create_key_pair(key_name)
-                key.save(os.path.expanduser('~/.ssh/'))
-                # for some reason, Boto saves always with the .pem extension!
-            else:
-                raise
+        key_name = credentials['key_name']
 
+        print "using key: " + key_name
         reservation = ec2c.run_instances(ami,
                                           instance_type=it,
                                           key_name=key_name,
@@ -114,6 +106,19 @@ def do_launch(it, instance_name):
     else:
         print 'just testing'
         print instance_name
+
+
+def do_createKey(ec2c, key_name):
+    try:
+        key = ec2c.get_all_key_pairs(keynames=[key_name])[0]
+    except ec2c.ResponseError, e:
+        if e.code == 'InvalidKeyPair.NotFound':
+            # Create an SSH key to use when logging into instances.
+            key = ec2c.create_key_pair(key_name)
+            key.save(os.path.expanduser('~/.ssh/'))
+            # for some reason, Boto saves always with the .pem extension!
+        else:
+            raise
 
 
 def do_kill(id):
@@ -242,7 +247,7 @@ def do_test():
     credentials = json.load(open('credentials.json', 'r'))
 
     success = True
-    for s in ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']:
+    for s in ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'key_name']:
         # print credentials[s], s, credentials[s] == s
         if credentials[s] == s:
             print "You need to edit credetials.json and fill in the " + s
