@@ -35,8 +35,9 @@ def do_ssh(ip, cmd):
 
 def do_wait2(ip):
     print 'waiting for machine to be ready ...'
+    time.sleep(2)
     output = do_ssh(ip, "ls")
-    while output[-9:-2] == 'refused':
+    while output[-9:-2] == 'refused' or output[-4:] == 'host':
         # print output
         print '.',
         output = do_ssh(ip, "ls")
