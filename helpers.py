@@ -36,11 +36,11 @@ def do_ssh(ip, cmd):
 def do_wait2(ip):
     print 'waiting for machine to be ready ...'
     time.sleep(2)
-    output = do_ssh(ip, "ls")
-    while output[-9:-2] == 'refused' or output[-6:2] == 'host':
-        print output
+    output = do_ssh(ip, "ls -la")
+    while output[:5] != 'total':
+        # print output
         print '.',
-        output = do_ssh(ip, "ls")
+        output = do_ssh(ip, "ls -la")
         time.sleep(2)
     print output
     print "... succesfully logged in once."
