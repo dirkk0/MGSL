@@ -19,6 +19,19 @@ That's it.
 
 The MGSL is essentially a python script orchestrating a series of bash scripts that get executed one after another on a different machine. One challenge was the timing of the distinct steps and the detection of possible failures of these steps. The latter is not handled good enough yet to be honest, and is one of the main reasons why I hesitated to open source this. Then again: the whole service is working on a daily basis so it is fair to say that it works well enough to be useful.
 
+Some details:
+
+- On first run, the script creates a 'session.json' file as soon as it starts the server. If you run the script again, it looks for this very file and assumes that a server is running that it needs to stop.
+
+- If you accidentally delete this (please don't!) then the script doesn't know it already started a server, and starts a new one, leaving a rogue instance running. You should run 'python status.py' and 'python kill.py' occasionally as a best practice. of course you can also check on the [AWS EC2 console](https://console.aws.amazon.com/ec2).
+
+- some of the steps involve external sources (the server.jar file for example). If for some reason the server is down, the script will break.
+
+- If you don't provide FTP server account details, the script assumes you do not want to save your world. Should you for some reason change your mind while playing, you can still edit the 'credentials.json' file and enter the FTP account details. On the next run, the world will be saved.
+
+- the FTP support has a very simple versionioning system - it uploads the file twice: one with a timestamp and the other one overrides the 'latest' version. The latest version is the one that gets downloaded next time.
+
+
 
 ## Installation
 To run it, do a git clone of the project or download the zip file and unpack it.
@@ -75,3 +88,7 @@ This when you try to connect too early. Just wait a minute and try again.
 
 - no conection
 This when you try to connect WAY too early. Or something went wrong.
+
+## Next steps ##
+
+- a web frontend. In fact I have a [web2py](http://www.web2py.com/) based multi user service in the works, but I guess a slimmer [flask](http://flask.pocoo.org/) single user service will do at first.
