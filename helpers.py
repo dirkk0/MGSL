@@ -1,4 +1,5 @@
-import subprocess
+import paramiko
+# import subprocess
 import time
 
 # import db
@@ -16,20 +17,56 @@ def do_wait():
     time.sleep(0.2)
 
 
+# def do_ssh_old(ip, cmd):
+#     user = "ubuntu"
+
+#     credentials = json.load(open('credentials.json', 'r'))
+#     key_name = credentials['key_name']
+#     key_path = os.path.join(os.path.expanduser('~/.ssh/'), key_name) + '.pem'
+
+#     args = "-i " + key_path
+#     args += " -o StrictHostKeyChecking=no"
+
+#     process = subprocess.Popen("ssh %s %s@%s '%s'" % (args, user, ip, cmd), shell=True,
+#         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+#     output, stderr = process.communicate()
+#     process.poll()
+#     return output
+
 def do_ssh(ip, cmd):
     user = "ubuntu"
 
     credentials = json.load(open('credentials.json', 'r'))
     key_name = credentials['key_name']
-    key_path = os.path.join(os.path.expanduser('~/.ssh/'), key_name) + '.pem'
+    # key_path = os.path.join(os.path.expanduser('~/.ssh/'), key_name) + '.pem'
 
-    args = "-i " + key_path
-    args += " -o StrictHostKeyChecking=no"
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(
+         paramiko.AutoAddPolicy())
 
-    process = subprocess.Popen("ssh %s %s@%s '%s'" % (args, user, ip, cmd), shell=True,
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output, stderr = process.communicate()
-    process.poll()
+    privatekeyfile = os.path.expanduser(key_name + '.pem')
+    mykey = paramiko.RSAKey.from_private_key_file(privatekeyfile)
+
+    import errno
+    MAXIMUM_NUMBER_OF_ATTEMPTS = 10
+    for attempt in range(MAXIMUM_NUMBER_OF_ATTEMPTS):
+        try:
+            ssh.connect(ip, username=user, pkey=mykey)
+        except EnvironmentError as exc:  # replace " as " with ", " for Python<2.6
+            if exc.errno == errno.ECONNREFUSED:
+                # print exc.errno,
+                print '-',
+                time.sleep(1)
+            else:
+                raise  # re-raise otherwise
+        else:  # we tried, and we had no failure, so
+            break
+    else:  # we never broke out of the for loop
+        raise RuntimeError("maximum number of unsuccessful attempts reached")
+
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    output = stdout.readlines()
+    # print output
     return output
 
 
@@ -37,7 +74,7 @@ def do_wait2(ip):
     print 'waiting for machine to be ready ...'
     time.sleep(2)
     output = do_ssh(ip, "ls -la")
-    while output[:5] != 'total':
+    while output[0][:5] != 'total':
         # print output
         print '.',
         output = do_ssh(ip, "ls -la")
@@ -57,10 +94,9 @@ def do_script(ip, script):
                 print output
 
 
-def do_launch(it, instance_name):
+def do_launch(it, ami, instance_name):
 
     test = False
-    ami = "ami-137bcf7a"
 
     credentials = json.load(open('credentials.json', 'r'))
     ec2c = ec2.connection.EC2Connection(

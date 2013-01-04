@@ -2,6 +2,7 @@ from helpers import *
 import os
 
 credentials = json.load(open('credentials.json', 'r'))
+app = json.load(open('app_minecraft.json', 'r'))
 
 # this is the filename of the backup on the FTP server
 # chose a simple word that will work as a filename
@@ -17,7 +18,7 @@ if credentials['ftp_server'] == 'fill_ftp_server':
 
 # load all credetials
 
-# we set bach variables
+# we set back variables
 generic_credentials = """
 FTP_SERVER=%s
 FTP_USERNAME=%s
@@ -43,7 +44,8 @@ if __name__ == '__main__':
         a = raw_input("you are about to START a server. Continue? (y/n)")
         if a == "y":
             session = {}
-            session["ip"], session["id"] = do_launch('t1.micro', worldname + 'server')
+            print worldname
+            session["ip"], session["id"] = do_launch(app['type'], app['ami'], app['name'])
             open('session.json', 'w').write(json.dumps(session))
             print session
 
@@ -57,7 +59,7 @@ if __name__ == '__main__':
                 for s in ['init', 'load', 'start']:
                     do_script(session['ip'], scripts[s])
 
-            print "You can now start minecraft and do a direct connect to " + session['ip']
+            print "You can now start minecraft and do a 'multiplayer/direct connect' to: " + session['ip']
             # print "To acess it do 'ssh -i %s/%s ubuntu@%s"
             # % (credentials['key_path'], credentials['key_name'], session['ip'])
 
