@@ -34,13 +34,25 @@ Some details:
 
 
 ## Installation
+### Install prerequisites on Ubuntu or Mac OSX
 To run it, do a git clone of the project or download the zip file and unpack it.
 You need to [install](http://stackoverflow.com/questions/2481287/how-do-i-install-boto) [boto](https://github.com/boto/boto):
 
     pip install boto
+    pip install paramiko
 
 worked for me.
 
+### Install prerequisites on Windows 7
+
+- install Python from [here](http://python.org/download/releases/2.7.3/). Chose the 'Windows x86 MSI Installer (2.7.3).
+- install pip from [here](http://pypi.python.org/pypi/setuptools#windows). Choose 'setuptools-0.6c11.win32-py2.7.exe'.
+- install pycrypto from [here](http://www.voidspace.org.uk/python/modules.shtml#pycrypto). Choose 'PyCrypto 2.6 for Python 2.7 32bit'.
+- cd 'C:\Python27', cd 'Scripts'. Do 'pip install boto' and 'pip install paramiko' on the command line.
+- download [MGSL](https://github.com/dirkk0/MGSL/archive/master.zip)
+- unzip it and rename the folder MGSL-master to mgsl (optional)
+
+### Prepare MGSL
 Then (important!) fill in these parameters in the file 'credentials.json' by copying the file 'credentials_template.json':
 
     cp credentials_template.json credentials.json
@@ -58,6 +70,17 @@ Then edit it with a text editor.
     }
 
 It is mandatory to fill in the first 4 lines. The first two parameters you find these in your [AWS Security Credentials settings](https://portal.aws.amazon.com/gp/aws/securityCredentials). The FTP lines are important if you want to make your world persistent.
+
+### Run
+
+    cd path/to/mgsl
+    python mgsl.py
+
+On a fresh windows installation you might have to do
+
+    cd path\to\mgsl
+    C:\Python27\python mgsl.py
+
 
 ## Why FTP?
 Glad you are asking. Of course it would've been much more straightforward to save everything to Amazon S3, right? But then again, everybody and his brother has some FTP access lying around that is never really used. Since we don't deal with enterprise data this is good enough and usually doesn't cost any extra money. I guess I should add S3 anyways.
