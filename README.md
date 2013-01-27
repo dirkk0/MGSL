@@ -52,6 +52,12 @@ worked for me.
 - download [MGSL](https://github.com/dirkk0/MGSL/archive/master.zip)
 - unzip it and rename the folder MGSL-master to mgsl (optional)
 
+[EDIT] As @martin_english pointed out, on a 64bit Windows you should replace the 4th bullet with
+
+    cd ‘C:\Python27′, cd ‘Scripts’
+    easy_install boto
+    easy_install paramiko
+
 ### Prepare MGSL
 Then (important!) fill in these parameters in the file 'credentials.json' by copying the file 'credentials_template.json':
 
