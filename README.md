@@ -109,13 +109,13 @@ Again: if you have access to the free tier, you can run your tests for free.
 
 ## Known issues ##
 
-- bad login
+- bad login:
 This is not the scripts fault - for some reason there can be server timeouts on the minecraft.net site. You need to completely quit Minecraft and try again.
 
-- time out
-This when you try to connect too early. Just wait a minute and try again.
+- time out:
+This happens when you try to connect too early. Just wait a minute and try again.
 
-- no conection
+- no connection:
 This when you try to connect WAY too early. Or something went wrong.
 
 ## Next steps ##
