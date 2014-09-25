@@ -40,8 +40,10 @@ You need to [install](http://stackoverflow.com/questions/2481287/how-do-i-instal
 
     pip install boto
     pip install paramiko
+    pip install ecdsa
+    easy_install PyCrypto
 
-worked for me.
+(with sudo) worked for me.
 
 ### Install prerequisites on Windows 7
 
