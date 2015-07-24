@@ -38,10 +38,12 @@ Some details:
 To run it, do a git clone of the project or download the zip file and unpack it.
 You need to [install](http://stackoverflow.com/questions/2481287/how-do-i-install-boto) [boto](https://github.com/boto/boto):
 
+    apt-get install -y python-pip
+
     pip install boto
     pip install paramiko
-    pip install ecdsa
-    easy_install PyCrypto
+    pip install ecdsa        # needed only on a mac
+    easy_install PyCrypto    # needed only on a mac
 
 (with sudo) worked for me.
 
