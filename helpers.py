@@ -79,7 +79,7 @@ def do_wait2(ip):
         print '.',
         output = do_ssh(ip, "ls -la")
         time.sleep(2)
-    print output
+    print (output)
     print "... succesfully logged in once."
 
 
